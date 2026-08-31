@@ -6,7 +6,6 @@
 use core::ops::Range;
 
 mod consts;
-mod masks;
 
 pub use consts::{bit, set_bit};
 
