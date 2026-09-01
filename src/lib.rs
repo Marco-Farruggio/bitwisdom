@@ -1,4 +1,4 @@
-//! A no-std, const-friendly, no-unsafe bit manipulation library, written in pure Rust
+//! A no-std, no-unwrap, const-friendly, no-unsafe bit manipulation library, written in pure Rust
 //! Implemented for all primitives
 
 #![no_std]
