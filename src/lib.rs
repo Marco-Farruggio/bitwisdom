@@ -5,12 +5,15 @@
 
 use core::ops::Range;
 
-mod consts;
-mod floats;
-mod float_wise;
+pub mod consts;
+pub mod floats;
+pub mod masks;
+pub mod float_wise;
 
-pub use consts::{bit, set_bit};
-pub use float_wise::FloatWise;
+pub mod traits {
+    pub use super::Bitwise;
+    pub use super::float_wise::FloatWise;
+}
 
 pub trait Bitwise {
     fn bit(&self, index: usize) -> bool;
@@ -25,66 +28,46 @@ pub trait Bitwise {
 
 macro_rules! impl_bitwise {
     ($ty:ty, $name:ident, $range_name:ident) => {
-        #[inline]
-        const fn $name(index: usize) -> $ty {
-            1 << index
-        }
-
-        /// Returns a mask with bits set in the specified range
-        /// 
-        /// A diagram of how this works:
-        /// 11111111 >> 2 = 00111111
-        /// 11111111 << 3 = 11111000
-        ///                    &
-        ///               = 00111000
-        #[inline]
-        const fn $range_name(range: Range<usize>) -> $ty {
-            (!0 as $ty >> (<$ty>::BITS as usize - range.end))
-                &
-            (!0 as $ty << range.start)
-        }
-
         impl Bitwise for $ty {
             #[inline]
             fn bit(&self, index: usize) -> bool {
-                *self & $name(index) != 0
+                *self & masks::$name(index) != 0
             }
 
             #[inline]
             fn set_bit(&mut self, index: usize) {
-                *self |= $name(index);
+                *self |= masks::$name(index);
             }
 
             #[inline]
             fn clear_bit(&mut self, index: usize) {
-                *self &= !$name(index);
+                *self &= !masks::$name(index);
             }
 
             #[inline]
             fn any_bits(&self, range: Range<usize>) -> bool {
-                *self & $range_name(range) != 0
+                *self & masks::$range_name(range) != 0
             }
 
             #[inline]
             fn all_bits(&self, range: Range<usize>) -> bool {
-                let mask = $range_name(range);
+                let mask = masks::$range_name(range);
                 *self & mask == mask
             }
 
             #[inline]
             fn set_bits(&mut self, range: Range<usize>) {
-                *self |= $range_name(range);
+                *self |= masks::$range_name(range);
             }
 
             #[inline]
             fn clear_bits(&mut self, range: Range<usize>) {
-                *self &= !$range_name(range);
+                *self &= !masks::$range_name(range);
             }
         }
     };
 }
 
-// Rust-analyzer reports a false positive error here, E0109, frustrating
 impl_bitwise!(u8,    u8_bit_mask,    u8_range_mask);
 impl_bitwise!(u16,   u16_bit_mask,   u16_range_mask);
 impl_bitwise!(u32,   u32_bit_mask,   u32_range_mask);

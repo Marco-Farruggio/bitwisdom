@@ -1,4 +1,4 @@
-use bitwisdom::Bitwise;
+use bitwisdom::traits::Bitwise;
 
 #[test]
 fn bit() {

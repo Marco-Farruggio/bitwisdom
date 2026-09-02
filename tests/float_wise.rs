@@ -1,4 +1,4 @@
-use bitwisdom::FloatWise;
+use bitwisdom::traits::FloatWise;
 
 #[test]
 fn f32_constants() {
